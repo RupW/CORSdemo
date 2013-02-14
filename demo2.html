@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><title>Single-origin policy demo</title>
+<script src="jquery-1.9.1.js" type="text/javascript"></script>
+<style type="text/css">
+
+td { font: Arial; font-size: 150%; padding:1em; }
+td.success { background-color: Green; color: White; }
+td.successNoData { background-color: Yellow; }
+td.error { background-color: Red; color: White; }
+
+</style>
+</head>
+<body>
+<table id="test">
+<tr><td>Same server over HTTP</td><td class="json">http://grizzlybear.zoo.lan/test.json</td><td></td></tr>
+<tr><td>Same server over HTTPS</td><td class="json">https://grizzlybear.zoo.lan/test.json</td><td></td></tr>
+<tr><td>Same server but localhost</td><td class="json">http://localhost/test.json</td><td></td></tr>
+<tr><td>Different domain</td><td class="json">http://rupertwood.com/test.json</td><td></td></tr>
+<tr><td>localhost JSONP</td><td class="jsonp">http://localhost/jsonp.ashx</td><td></td></tr>
+</table>
+</body>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // JSON
+        $('#test tr td.json').each(function () {
+            var $this = $(this);
+            var url = $this.text();
+            var $output = $this.next();
+            $.ajax({
+                url: url,
+                success: function (data, status, jqXHR) {
+                    if (data && data.result) {
+                        $output.addClass("success").text(data.result);
+                    } else {
+                        $output.addClass("successNoData").text("no data");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var $span = $('<span></span>').attr('title', errorThrown).text(textStatus);
+                    $output.addClass("error").empty().append($span);
+                }
+            });
+        });
+
+        // JSONP
+        $('#test tr td.jsonp').each(function () {
+            var $this = $(this);
+            var url = $this.text();
+            var $output = $this.next();
+            $.ajax({
+                url: url,
+                dataType: 'jsonp',
+                success: function (data, status, jqXHR) {
+                    if (data && data.result) {
+                        $output.addClass("success").text(data.result);
+                    } else {
+                        $output.addClass("successNoData").text("no data");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var $span = $('<span></span>').attr('title', errorThrown).text(textStatus);
+                    $output.empty().append($span);
+                }
+            });
+        });
+
+
+    });
+</script>
+</html>
